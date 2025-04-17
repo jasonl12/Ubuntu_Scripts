@@ -1,0 +1,6 @@
+black
+ipython
+python-dotenv
+psycopg2-binary
+pytest
+pytest-env
