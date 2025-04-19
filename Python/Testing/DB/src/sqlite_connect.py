@@ -31,6 +31,8 @@ class WinSum:
 
 def sqlite_memory():
     ret = {}
+    ret["db_ver"] = sqlite3.sqlite_version
+
     try:
         conn = sqlite3.connect(":memory:")
         conn.create_aggregate("mysum", 1, MySum)
@@ -39,14 +41,13 @@ def sqlite_memory():
         cur.execute("INSERT INTO test(i) VALUES(1)")
         cur.execute("INSERT INTO test(i) VALUES(2)")
         cur.execute("SELECT mysum(i) FROM test")
+        ret["fetch"] = cur.fetchone()[0]
 
     except sqlite3.Error as e:
         ret["e_msg"] = f"Error: {e}"
         return ret
 
     else:
-        ret["db_ver"] = sqlite3.sqlite_version
-        ret["fetch"] = cur.fetchone()[0]
         return ret
 
     finally:
@@ -56,6 +57,8 @@ def sqlite_memory():
 
 def sqlite_file():
     ret = {}
+    ret["db_ver"] = sqlite3.sqlite_version
+
     try:
         conn = sqlite3.connect("testDB.db")
         conn.create_window_function("sumint", 1, WinSum)
@@ -99,7 +102,6 @@ def sqlite_file():
         return ret
 
     else:
-        ret["db_ver"] = sqlite3.sqlite_version
         return ret
 
     finally:
