@@ -1,0 +1,68 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+  config.vm.define "puppetserver" do |puppetserver|
+    puppetserver.vm.box = "bento/ubuntu-22.04"
+    puppetserver.vm.provider "" do |vb|
+      vb.memory = 4096
+      vb.cpus = 4
+    end
+    puppetserver.vm.network "private_network", ip: "10.0.3.2"
+    puppetserver.vm.hostname = "puppetserver.vagrant.local"
+    puppetserver.vm.provision "shell", inline: <<-SHELL
+      timedatectl set-timezone America/Los_Angeles
+      useradd -p $(openssl passwd -6 -salt b@rFo0 foobar) -m -s /bin/bash -G sudo foobar
+      bash -c "echo '10.0.3.2 puppetserver.vagrant.local' >> /etc/hosts"
+      apt-get update
+      apt-get install -y bash-completion aptitude net-tools tree zsh
+      apt-get remove --purge -y snapd ubuntu-advantage-tools cloud-init
+      apt-get remove --purge -y mdadm modemmanager
+      apt-get autoremove -y
+      chmod -x /etc/update-motd.d/10-help-text
+      chmod -x /etc/update-motd.d/99-bento
+      mv /etc/apt/apt.conf.d/20apt-esm-hook.conf /etc/apt/apt.conf.d/20apt-esm-hook.conf.disabled
+      cat > /etc/modprobe.d/local-dontload.conf <<EOF
+blacklist input_leds
+blacklist joydev
+blacklist btrfs
+blacklist raid0
+blacklist raid1
+blacklist raid10
+EOF
+      update-initramfs -u
+    SHELL
+  end
+end
+
+Vagrant.configure("2") do |config|
+  config.vm.define "node01" do |node01|
+    # node01.vm.box = "bento/ubuntu-24.04"
+    node01.vm.box = "bento/ubuntu-22.04"
+    node01.vm.network "private_network", ip: "10.0.3.5"
+    node01.vm.network "forwarded_port", guest:8080, host: 8080
+    node01.vm.hostname = "node01.vagrant.local"
+    node01.vm.provision "shell", inline: <<-SHELL
+      timedatectl set-timezone America/Los_Angeles
+      useradd -p $(openssl passwd -6 -salt b@rFo0 foobar) -m -s /bin/bash -G sudo foobar
+      bash -c "echo '10.0.3.2 puppetserver.vagrant.local' >> /etc/hosts"
+      apt-get update
+      apt-get install -y bash-completion aptitude net-tools tree zsh fdupes
+      apt-get remove --purge -y snapd ubuntu-advantage-tools cloud-init
+      apt-get remove --purge -y mdadm modemmanager open-iscsi
+      apt-get autoremove -y
+      chmod -x /etc/update-motd.d/10-help-text
+      chmod -x /etc/update-motd.d/99-bento
+      mv /etc/apt/apt.conf.d/20apt-esm-hook.conf /etc/apt/apt.conf.d/20apt-esm-hook.conf.disabled
+      cat > /etc/modprobe.d/local-dontload.conf <<EOF
+blacklist input_leds
+blacklist joydev
+blacklist btrfs
+blacklist raid0
+blacklist raid1
+blacklist raid10
+EOF
+      update-initramfs -u
+    SHELL
+  end
+end
