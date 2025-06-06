@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 sudo sysctl -a | grep -e "vm.swappiness" \
 -e "vm.dirty_ratio" \

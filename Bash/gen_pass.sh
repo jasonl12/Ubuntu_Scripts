@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 l=$1
 [ "$l" == "" ] && l=20

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Create virtual environment (python3-venv)
 # python3 -m venv venv --prompt="backend" --upgrade-deps
