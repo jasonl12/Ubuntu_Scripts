@@ -1,0 +1,3 @@
+pip3 list --outdated --format=freeze > outdated_packages.txt
+cut -d '=' -f 1 outdated_packages.txt > packages_to_update.txt
+cat packages_to_update.txt | xargs -n1 pip3 install --no-cache-dir --upgrade
